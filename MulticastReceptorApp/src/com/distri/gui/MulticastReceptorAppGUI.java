@@ -168,8 +168,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     
     private void makeFile() {
         try {
-            Path currentRelativePath = Paths.get("src\\com\\distri\\resources\\files");
-            String path = currentRelativePath.toAbsolutePath().toString();
+            String path = System.getProperty("user.dir") + "/../WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources";
             FileOutputStream fileOutputStream = new FileOutputStream(new File(path + "\\" + fileName));
             for (int i = 0; i < dataReceived.size()-1; i++) {
                 fileOutputStream.write(dataReceived.get(i), 0, dataReceived.get(i).length);

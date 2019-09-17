@@ -6,10 +6,12 @@
 package com.distri.webservicerestmulticast;
 
 import java.io.File;
+import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -20,12 +22,15 @@ import javax.ws.rs.core.Response;
 @Path("/download")
 public class Download {
     
+    @Context ServletContext servletContext;
+    public String path;
     
     @GET
     @Path("/service-record/{Filename}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getFile(@PathParam("Filename") String filename) {
-      File file = new File("/home/pedross/NetBeansProjects/WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources/" + filename);
+      this.path = servletContext.getRealPath("/") + "../../src/main/java/com/distri/webservicerestmulticast/resources/";
+      File file = new File( path + filename);
       long length = file.length();
       return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM)
           .header("Content-length", String.valueOf(length))

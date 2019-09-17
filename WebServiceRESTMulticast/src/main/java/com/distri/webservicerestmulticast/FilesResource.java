@@ -8,6 +8,7 @@ package com.distri.webservicerestmulticast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
@@ -25,10 +26,9 @@ import javax.ws.rs.core.MediaType;
 @Path("Files")
 public class FilesResource {
 
-    @Context
-    private UriInfo context;
-    private final String dirName = "/home/pedross/NetBeansProjects/WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources/";
-    File file= new File(dirName);;
+    @Context ServletContext servletContext;
+    private String path;
+    File file;
     /**
      * Creates a new instance of FilesResource
      */
@@ -40,15 +40,21 @@ public class FilesResource {
      * Retrieves representation of an instance of com.distri.webservicerestmulticast.FilesResource
      * @return an instance of java.lang.String
      */
+    
+    public String getPath() {
+        return path;
+    }
+
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(value = MediaType.APPLICATION_JSON)
     public String getFiles() {
-        
+        this.path = servletContext.getRealPath("/") + "../../src/main/java/com/distri/webservicerestmulticast/resources";
+        File file = new File(path);
         return "{\"Files\":\"" + doListing(file) +"\"}";
     }
 
     
-    public String doListing(File dirName) {
+    public String doListing(File file) {
         File[] listOfFiles = file.listFiles();
         String Files = "";
         for (int i = 0; i < listOfFiles.length-1; i++) {

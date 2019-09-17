@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
@@ -33,7 +34,7 @@ import javax.ws.rs.core.Response;
 @Path("Main")
 public class MainResource {
 
-    @Context
+    @Context ServletContext servletContext;
     private UriInfo context;
     private RequestMethods r = new RequestMethods();
     private Set<String> hosts;
@@ -51,7 +52,7 @@ public class MainResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson() {
         
-        hosts = r.whoIsThere();//new ArrayList<>();//
+        hosts = r.whoIsThere(servletContext.getRealPath("/") + "/../../hosts.txt");//new ArrayList<>();//
         ArrayList<String> files = new ArrayList<>();
         for(String host : hosts){
             ArrayList<String> filesInHost = r.getAvailablesFiles(host);

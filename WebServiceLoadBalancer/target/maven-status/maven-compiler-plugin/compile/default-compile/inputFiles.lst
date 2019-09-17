@@ -1,4 +1,4 @@
-/home/pedross/NetBeansProjects/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/MainResource.java
-/home/pedross/NetBeansProjects/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/methods/RequestMethods.java
-/home/pedross/NetBeansProjects/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/methods/RoundRobin.java
-/home/pedross/NetBeansProjects/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/ApplicationConfig.java
+/home/pedross/Documents/Repositories/FileSharing-TCP-Multicast/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/methods/RequestMethods.java
+/home/pedross/Documents/Repositories/FileSharing-TCP-Multicast/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/ApplicationConfig.java
+/home/pedross/Documents/Repositories/FileSharing-TCP-Multicast/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/methods/RoundRobin.java
+/home/pedross/Documents/Repositories/FileSharing-TCP-Multicast/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/MainResource.java

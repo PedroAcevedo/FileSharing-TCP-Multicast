@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -30,15 +32,19 @@ import javax.ws.rs.core.Response.Status;
  */
 public class RequestMethods {
     
+    
+    
     public static HashMap<String, Integer> serverWeightMap = new HashMap<String, Integer>();  
     HttpURLConnection urlConnection;
+    String path;
     public void RequestMethods(){
-    
+
     }
 
 
-    public Set<String> whoIsThere(){
-        try (BufferedReader br = new BufferedReader(new FileReader("/home/pedross/NetBeansProjects/WebServiceLoadBalancer/hosts.txt"))) {
+    public Set<String> whoIsThere(String path){
+        this.path = path;
+        try (BufferedReader br = new BufferedReader(new FileReader(this.path))) {
 
             String strCurrentLine;
 
@@ -72,7 +78,7 @@ public class RequestMethods {
     }
     
     public void updateHost() throws IOException{
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("/home/pedross/NetBeansProjects/WebServiceLoadBalancer/hosts.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             for (String host : serverWeightMap.keySet()){
                 writer.write(host);
             }
