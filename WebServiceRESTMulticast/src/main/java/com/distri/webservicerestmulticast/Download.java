@@ -26,8 +26,10 @@ public class Download {
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getFile(@PathParam("Filename") String filename) {
       File file = new File("/home/pedross/NetBeansProjects/WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources/" + filename);
+      long length = file.length();
       return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM)
-          .header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"" ) //optional
+          .header("Content-length", String.valueOf(length))
+          .header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"")
           .build();
     }
     

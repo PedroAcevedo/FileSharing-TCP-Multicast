@@ -28,9 +28,9 @@ public class Request {
 
     public static String URL;
 
-    public Request() throws UnknownHostException {
-        Request.URL = "http://"+InetAddress.getLocalHost().getHostAddress()
-                +":8080/WebServiceLoadBalancer/webresources/Main";
+    public Request(String ipWebService) throws UnknownHostException {
+        Request.URL = "http://"+ipWebService+
+                ":8080/WebServiceLoadBalancer/webresources/Main";
     }
     
     public DefaultListModel filesAvailables() throws MalformedURLException, IOException{
@@ -52,6 +52,7 @@ public class Request {
                     listModel.addElement(archive.replace(" ", ""));
                 }
             }
+            urlConnection.disconnect();
         }
         return listModel;
     }    

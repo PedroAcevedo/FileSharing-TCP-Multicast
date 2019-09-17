@@ -13,6 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Action;
 import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
 
@@ -22,49 +23,69 @@ import javax.swing.JTextArea;
  */
 public class Downloading extends Thread{
     
-  JProgressBar progressBar;
-  JTextArea jText;
-  private long increment = 0;
-  private String filename;
-  
-  public Downloading(JProgressBar bar,String filename) {
-    this.progressBar = bar;
-    this.filename = filename;
-  }
-  
-  public Downloading(JTextArea jText, String filename){
-      this.jText = jText;
-      this.filename = filename;
-  }
+    JProgressBar progressBar;
+    JTextArea jText;
+    private float increment = 0;
+    private String filename;
+    HttpURLConnection urlConnection;
 
-  @Override
-  public void run() {
-    this.jText.setText( this.jText.getText() + "\n" + downloadFiles(this.filename));
-  }
+
+    public Downloading(JProgressBar bar,String filename) {
+      this.progressBar = bar;
+      this.filename = filename;
+    }
+
+    public Downloading(JTextArea jText, String filename){
+        this.jText = jText;
+        this.filename = filename;
+    }
+
+    @Override
+    public void run() {
+//      try {
+//          downloadFile(filename);
+//      } catch (IOException ex) {
+//          Logger.getLogger(Downloading.class.getName()).log(Level.SEVERE, null, ex);
+//      }    
+    jText.setText(jText.getText() + "\n" + downloadFiles(filename));
+
+    }
+    
+    public void RefreshProgress(float value)   {
+
+        if (this == null) return;
+        progressBar.setValue(progressBar.getValue() + (int)value);
+        System.out.println((int)value);
+
+    }
   
     public void downloadFile(String filename) throws MalformedURLException, IOException{     
       
         try{
         URL url = new URL(Request.URL + "/download/" + filename);
-        HttpURLConnection urlConnection=(HttpURLConnection) url.openConnection();
+        urlConnection=(HttpURLConnection) url.openConnection();
         urlConnection.connect();
         if(urlConnection.getResponseCode() / 100 == 2){
-            float contentLength = urlConnection.getContentLengthLong(); 
-            increment = (long) ((100*(contentLength/1024))/contentLength);
+            //
             BufferedInputStream in = new BufferedInputStream(url.openStream());
+            float contentLength = in.available();
+            //increment = (float)((100*1024)/contentLength);
+            //System.out.println(urlConnection.getHeaderField("Content-length"));
             FileOutputStream fileOutputStream = new FileOutputStream("/home/pedross/NetBeansProjects/WebServiceClient/src/" + filename);
             byte dataBuffer[] = new byte[1024];
             int bytesRead;
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                fileOutputStream.write(dataBuffer, 0, bytesRead);
-               int value = this.progressBar.getValue();
-               this.progressBar.setValue(value + (int)increment);
+              //this.RefreshProgress(increment);
                
             }
         }
         } catch (IOException e) {
             System.out.println(e);
         }
+        finally {
+            urlConnection.disconnect();
+        }    
     }
     
     public String downloadFiles(String filename){     
@@ -78,7 +99,7 @@ public class Downloading extends Thread{
               return "Se descargo el archivo: " + filename;
         } catch (IOException e) {
             System.out.println(e);
-        }
+        } 
         return "Error en descarga";
     }
 }

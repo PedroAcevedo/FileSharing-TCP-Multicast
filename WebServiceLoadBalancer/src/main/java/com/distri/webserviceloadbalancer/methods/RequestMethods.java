@@ -31,7 +31,7 @@ import javax.ws.rs.core.Response.Status;
 public class RequestMethods {
     
     public static HashMap<String, Integer> serverWeightMap = new HashMap<String, Integer>();  
-    
+    HttpURLConnection urlConnection;
     public void RequestMethods(){
     
     }
@@ -58,14 +58,16 @@ public class RequestMethods {
         try {
             String endpoint="http://"+Host+":8080/WebServiceRESTMulticast/";
             URL url=new URL(endpoint);
-            HttpURLConnection urlConnection=(HttpURLConnection) url.openConnection();
+            urlConnection=(HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(5000);
             if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 return true;
             }
         } catch (IOException e) {
-        
-        }
+            System.err.println(e);
+        }finally {
+            urlConnection.disconnect();
+        }    
         return false;
     }
     
@@ -94,7 +96,7 @@ public class RequestMethods {
         try {
             String endpoint="http://"+host+":8080/WebServiceRESTMulticast/webresources/Files";
             URL url=new URL(endpoint);
-            HttpURLConnection urlConnection=(HttpURLConnection) url.openConnection();
+            urlConnection=(HttpURLConnection) url.openConnection();
             urlConnection.setConnectTimeout(5000);
             int httpResponseCode=urlConnection.getResponseCode();
             if(httpResponseCode==HttpURLConnection.HTTP_OK){
@@ -111,14 +113,15 @@ public class RequestMethods {
             return files;
         } catch (Exception e) {
             System.out.println(e);
-        }   
+        }finally {
+            urlConnection.disconnect();
+        }       
         return files;
     }
      
     public Response getFileFromHost(String hostIP, String filename) throws MalformedURLException, IOException{
        String endpoint="http://"+hostIP+":8080/WebServiceRESTMulticast/webresources/download/service-record/" + filename;
        return Response.ok(new URL(endpoint).openStream(), MediaType.APPLICATION_OCTET_STREAM)
-       .header("Content-Disposition", "attachment; filename=\"" + filename + "\"" ) //optional
        .build(); 
     }
     
