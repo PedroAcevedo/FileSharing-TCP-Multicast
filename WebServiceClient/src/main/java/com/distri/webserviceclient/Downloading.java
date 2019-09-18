@@ -71,7 +71,7 @@ public class Downloading extends Thread{
             float contentLength = in.available();
             //increment = (float)((100*1024)/contentLength);
             //System.out.println(urlConnection.getHeaderField("Content-length"));
-            FileOutputStream fileOutputStream = new FileOutputStream("/home/pedross/NetBeansProjects/WebServiceClient/src/" + filename);
+            FileOutputStream fileOutputStream = new FileOutputStream("/home/pedross/Documents/Repositories/FileSharing-TCP-Multicast/WebServiceClient/" + filename);
             byte dataBuffer[] = new byte[1024];
             int bytesRead;
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -90,7 +90,7 @@ public class Downloading extends Thread{
     
     public String downloadFiles(String filename){     
         try (BufferedInputStream in = new BufferedInputStream(new URL(Request.URL + "/download/" + filename).openStream());
-            FileOutputStream fileOutputStream = new FileOutputStream("/home/pedross/NetBeansProjects/WebServiceClient/src/" + filename)) {
+            FileOutputStream fileOutputStream = new FileOutputStream( System.getProperty("user.dir") + "/resources/" + filename)) {
             byte dataBuffer[] = new byte[1024];
             int bytesRead;
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
