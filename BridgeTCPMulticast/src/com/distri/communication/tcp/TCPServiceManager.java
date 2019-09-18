@@ -15,7 +15,6 @@ import java.net.Socket;
 public class TCPServiceManager extends Thread {
     
     public static final int PORT = 9090;
-    public static final int BUFFER_SIZE = 1500;
     
     ServerSocket serverSocket;
     private TCPServiceManagerCallerInterface caller;

@@ -6,7 +6,10 @@
 package com.distri.gui;
 
 import com.distri.communication.tcp.ClientSocketManager;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -18,6 +21,8 @@ import javax.swing.JOptionPane;
  */
 public class ClientAppGUI extends javax.swing.JFrame {
 
+    public static int MTU;
+    
     ClientSocketManager clientSocket;
     File selectedFile = null;
     
@@ -26,8 +31,21 @@ public class ClientAppGUI extends javax.swing.JFrame {
      */
     public ClientAppGUI() {
         initComponents();
+        configMTU();
     }
 
+    private void configMTU() {
+        try {
+            ClientAppGUI.MTU = Integer.parseInt(
+                    (new BufferedReader(new FileReader(
+                            Paths.get("src\\com\\distri\\resources\\config\\MTU.config").toAbsolutePath().toString())
+                    )).readLine()
+            );
+        }catch (Exception ex) {
+            System.err.println(ex);
+        }
+    }
+    
     private void searchFile() {
         JFileChooser file = new JFileChooser();
         file.showOpenDialog(this);
@@ -139,7 +157,7 @@ public class ClientAppGUI extends javax.swing.JFrame {
         if(selectedFile != null) {
             try {
                 clientSocket = new ClientSocketManager(selectedFile, ipTextField.getText(),
-                        Integer.parseInt(portTextField.getText()));
+                        Integer.parseInt(portTextField.getText()), ClientAppGUI.MTU);
                 clientSocket.uploadFile();
             }catch (Exception ex) {
                 Logger.getLogger(ClientAppGUI.class.getName()).log(Level.SEVERE, null, ex);

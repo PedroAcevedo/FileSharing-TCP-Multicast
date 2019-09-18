@@ -22,11 +22,13 @@ public class MulticastManager extends Thread {
     private int port;
     private MulticastManagerCallerInterface caller;
     private boolean isEnable = true;
+    private int MTU;
     
-    public MulticastManager(String ipAddress, int port, MulticastManagerCallerInterface caller) {
+    public MulticastManager(String ipAddress, int port, MulticastManagerCallerInterface caller, int MTU) {
         this.ipAddress = ipAddress;
         this.port = port;
         this.caller = caller;
+        this.MTU = MTU;
         this.start();
     }
     
@@ -45,7 +47,7 @@ public class MulticastManager extends Thread {
     @Override
     public void run() {
         DatagramPacket datagramPacket = new DatagramPacket(
-                new byte[TCPServiceManager.BUFFER_SIZE], TCPServiceManager.BUFFER_SIZE);
+                new byte[MTU], MTU);
         if(initializeMulticastSocket()){
             while(isEnable){
                 try {

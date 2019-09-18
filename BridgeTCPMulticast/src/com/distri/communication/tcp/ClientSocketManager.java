@@ -21,11 +21,13 @@ public class ClientSocketManager {
     private File file;
     private String serverIpAddress;
     private int port;
+    private int MTU;
 
-    public ClientSocketManager(File file, String serverIpAddress, int port) {
+    public ClientSocketManager(File file, String serverIpAddress, int port, int MTU) {
         this.file = file;
         this.serverIpAddress = serverIpAddress;
         this.port = port;
+        this.MTU = MTU;
     }
     
     public void uploadFile() {
@@ -42,7 +44,7 @@ public class ClientSocketManager {
             objectOutputStream.writeObject(file.getName());
             
             FileInputStream fileInputStream = new FileInputStream(file);
-            byte[] buffer = new byte[TCPServiceManager.BUFFER_SIZE];
+            byte[] buffer = new byte[MTU];
             
             //Revisar
             Integer bytesRead = 0;

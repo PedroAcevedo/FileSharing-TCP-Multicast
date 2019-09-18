@@ -9,9 +9,12 @@ import com.distri.communication.multicast.MulticastManager;
 import com.distri.communication.multicast.MulticastManagerCallerInterface;
 import com.distri.communication.tcp.TCPServiceManager;
 import com.distri.communication.tcp.TCPServiceManagerCallerInterface;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -21,14 +24,25 @@ import java.util.Arrays;
  */
 public class BridgeManager implements TCPServiceManagerCallerInterface, MulticastManagerCallerInterface {
     
+    public static int MTU;
+    
     TCPServiceManager tcpServiceManager;
     MulticastManager multicastManager;
     
     ArrayList<byte[]> dataToBeSent;
     
     public BridgeManager() {
-        this.tcpServiceManager = new TCPServiceManager(this);
-        this.multicastManager = new MulticastManager("224.0.0.1", 9091, this);
+        try {
+            BridgeManager.MTU = Integer.parseInt(
+                    (new BufferedReader(new FileReader(
+                            Paths.get("src\\com\\distri\\resources\\config\\MTU.config").toAbsolutePath().toString())
+                    )).readLine()
+            );
+            this.tcpServiceManager = new TCPServiceManager(this);
+            this.multicastManager = new MulticastManager("224.0.0.1", 9091, this, BridgeManager.MTU);
+        }catch (Exception ex) {
+            System.err.println(ex);
+        }
     }
     
     public static void main(String[] args) {
@@ -42,7 +56,7 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
             ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
             
-            byte[] buffer = new byte[TCPServiceManager.BUFFER_SIZE];
+            byte[] buffer = new byte[BridgeManager.MTU];
 
             Object object = objectInputStream.readObject();
             
@@ -69,7 +83,7 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
                 buffer = (byte[]) object;
                 dataToBeSent.add(Arrays.copyOf(buffer, bytesRead));
                 dataCounter++;
-            }while (bytesRead == TCPServiceManager.BUFFER_SIZE);
+            }while (bytesRead == BridgeManager.MTU);
             
             String controlString = "P0/" + nameFile + "/" + dataCounter + "/" + bytesRead + "/";
             multicastManager.sendData(controlString.getBytes());

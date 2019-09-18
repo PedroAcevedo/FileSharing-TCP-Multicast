@@ -7,8 +7,10 @@ package com.distri.gui;
 
 import com.distri.communication.multicast.MulticastManager;
 import com.distri.communication.multicast.MulticastManagerCallerInterface;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ import java.util.Arrays;
  */
 public class MulticastReceptorAppGUI extends javax.swing.JFrame implements MulticastManagerCallerInterface {
 
+    public static int MTU;
+    
     MulticastManager multicastManager;
     String fileName;
     int numberDatagrams;
@@ -34,6 +38,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
      */
     public MulticastReceptorAppGUI() {
         initComponents();
+        configMTU();
         this.multicastManager = null;
         this.storeData = false;
         this.fileName = "DefaultFileName";
@@ -42,6 +47,18 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         this.datagramCounter = 0;
     }
 
+    private void configMTU() {
+        try {
+            MulticastReceptorAppGUI.MTU = Integer.parseInt(
+                    (new BufferedReader(new FileReader(
+                            Paths.get("src\\com\\distri\\resources\\config\\MTU.config").toAbsolutePath().toString())
+                    )).readLine()
+            );
+        }catch (Exception ex) {
+            System.err.println(ex);
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -157,7 +174,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         try {
             if(multicastManager == null) {
                 multicastManager = new MulticastManager(ipTextField.getText(), 
-                        Integer.parseInt(portTextField.getText()), this);
+                        Integer.parseInt(portTextField.getText()), this, MulticastReceptorAppGUI.MTU);
                 return true;
             }
         }catch (Exception ex) {
