@@ -11,10 +11,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -214,16 +218,28 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
             this.lastByteLength.add(Integer.parseInt(controlData[3]));
             this.dataReceived.add(new ArrayList<>());
             this.datagramCounters.add(0);
-        }else {
-            String headerString = new String(Arrays.copyOf(data, 100));
-            String[] headerName = headerString.split("/");
-            if(fileNames.contains(headerName[0])) {
-                int fileIndex = fileNames.indexOf(headerName[0]);
-                dataReceived.get(fileIndex).add(Arrays.copyOf(data, data.length));
-                Integer counter = datagramCounters.get(fileIndex);
-                datagramCounters.set(fileIndex, counter+1);
-                if(datagramCounters.get(fileIndex) >= numberDatagrams.get(fileIndex)) {
-                    this.makeFile(fileIndex);
+        }else{
+            //System.out.println(controlData.equals("C0"));
+            if(controlData[0].equals("C0") && MulticastReceptorAppGUI.MTU != Integer.parseInt(controlData[1])){
+                try {
+                    FileWriter MTUupdater = new FileWriter("src\\com\\distri\\resources\\config\\MTU.config");
+                    MTUupdater.write(controlData[1]);
+                    MTUupdater.close();
+                    System.out.println("MTU updated...");
+                } catch (IOException ex) {
+                    Logger.getLogger(MulticastReceptorAppGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }else {
+                String headerString = new String(Arrays.copyOf(data, 100));
+                String[] headerName = headerString.split("/");
+                if(fileNames.contains(headerName[0])) {
+                    int fileIndex = fileNames.indexOf(headerName[0]);
+                    dataReceived.get(fileIndex).add(Arrays.copyOf(data, data.length));
+                    Integer counter = datagramCounters.get(fileIndex);
+                    datagramCounters.set(fileIndex, counter+1);
+                    if(datagramCounters.get(fileIndex) >= numberDatagrams.get(fileIndex)) {
+                        this.makeFile(fileIndex);
+                    }
                 }
             }
         }
@@ -242,4 +258,9 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField portTextField;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void sendString(String data) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

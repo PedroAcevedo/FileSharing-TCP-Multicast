@@ -40,6 +40,7 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
             );
             this.tcpServiceManager = new TCPServiceManager(this);
             this.multicastManager = new MulticastManager("224.0.0.1", 9091, this, BridgeManager.MTU);
+            sendString("C0/"+ BridgeManager.MTU+"/basura");
         }catch (Exception ex) {
             System.err.println(ex);
         }
@@ -114,6 +115,11 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
     @Override
     public void errorOnMulticastManager(Exception ex) {
         System.err.println(ex);
+    }
+
+    @Override
+    public void sendString(String data) {
+        multicastManager.sendData(data.getBytes());
     }
     
 }

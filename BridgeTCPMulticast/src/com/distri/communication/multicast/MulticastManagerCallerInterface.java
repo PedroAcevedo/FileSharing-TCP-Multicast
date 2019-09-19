@@ -13,5 +13,6 @@ public interface MulticastManagerCallerInterface {
     
     void dataReceived(String sourceIpAddressOrHost, int sourcePort, byte[] data);
     void errorOnMulticastManager(Exception ex);
+    void sendString(String data);
     
 }
