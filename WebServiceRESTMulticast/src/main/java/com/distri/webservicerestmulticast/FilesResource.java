@@ -50,18 +50,20 @@ public class FilesResource {
     public String getFiles() {
         this.path = servletContext.getRealPath("/") + "../../src/main/java/com/distri/webservicerestmulticast/resources";
         File file = new File(path);
-        return "{\"Files\":\"" + doListing(file) +"\"}";
+        return "{ \"Files\":" +  doListing(file) + "}";
     }
 
     
     public String doListing(File file) {
         File[] listOfFiles = file.listFiles();
         String Files = "";
-        for (int i = 0; i < listOfFiles.length-1; i++) {
-            Files = listOfFiles[i].getName() + "," + Files; 
+        String Size = "";
+        for (int i = 0; i < listOfFiles.length; i++) {
+            Files = Files + "\"" +  listOfFiles[i].getName() + "\":" + listOfFiles[i].length() +","; 
         }
-        Files = "[" + Files + listOfFiles[listOfFiles.length-1].getName() + "]";
+        Files = "{" + Files.substring(0, Files.length()-1) + "}";
         return Files;
+
     }
     
     /**

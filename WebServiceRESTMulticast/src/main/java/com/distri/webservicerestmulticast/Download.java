@@ -33,10 +33,17 @@ public class Download {
       File file = new File( path + filename);
       long length = file.length();
       return Response.ok(file, MediaType.APPLICATION_OCTET_STREAM)
-          .header("Content-length", String.valueOf(length))
           .header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"")
           .build();
     }
     
+    
+    @GET
+    @Path("/service-record/size/{Filename}")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public String getFileSize(@PathParam("Filename") String filename){
+        this.path = servletContext.getRealPath("/") + "../../src/main/java/com/distri/webservicerestmulticast/resources/";
+        return String.valueOf(new File( path + filename).length());
+    }
 
 }

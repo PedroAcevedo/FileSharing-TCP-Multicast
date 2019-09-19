@@ -68,7 +68,7 @@ public class MulticastManager extends Thread {
             outgoingPacket.setPort(port);
             outgoingPacket.setData(payload);
             multicastSocket.send(outgoingPacket);
-            Thread.sleep(10);
+            Thread.sleep(0, 10);
         }catch (Exception ex) {
             caller.errorOnMulticastManager(ex);
         }

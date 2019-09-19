@@ -25,13 +25,12 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     public static int MTU;
     
     MulticastManager multicastManager;
-    String fileName;
-    int numberDatagrams;
-    int lastByteLength;
-    ArrayList<byte[]> dataReceived;
-    boolean storeData;
+    ArrayList<String> fileNames;
+    ArrayList<Integer> numberDatagrams;
+    ArrayList<Integer> lastByteLength;
+    ArrayList<ArrayList<byte[]>> dataReceived;
     
-    int datagramCounter;
+    ArrayList<Integer> datagramCounters;
     
     /**
      * Creates new form MulticastReceptorAppGUI
@@ -40,11 +39,11 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         initComponents();
         configMTU();
         this.multicastManager = null;
-        this.storeData = false;
-        this.fileName = "DefaultFileName";
-        this.numberDatagrams = 0;
-        this.lastByteLength = 0;
-        this.datagramCounter = 0;
+        this.fileNames = new ArrayList<>();
+        this.numberDatagrams = new ArrayList<>();
+        this.lastByteLength = new ArrayList<>();
+        this.dataReceived = new ArrayList<>();
+        this.datagramCounters = new ArrayList<>();
     }
 
     private void configMTU() {
@@ -132,6 +131,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         // TODO add your handling code here:
         if(initializeMulticastManager()) {
             connectButton.setEnabled(false);
+            this.setVisible(false);
         }
     }//GEN-LAST:event_connectButtonActionPerformed
 
@@ -183,19 +183,22 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         return false;
     }
     
-    private void makeFile() {
+    private void makeFile(int fileIndex) {
         try {
             String path = System.getProperty("user.dir") + "/../WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources";
-            FileOutputStream fileOutputStream = new FileOutputStream(new File(path + "\\" + fileName));
-            for (int i = 0; i < dataReceived.size()-1; i++) {
-                fileOutputStream.write(dataReceived.get(i), 0, dataReceived.get(i).length);
+            FileOutputStream fileOutputStream = new FileOutputStream(new File(path + "\\" + fileNames.get(fileIndex)));
+            for (int i = 0; i < dataReceived.get(fileIndex).size()-1; i++) {
+                fileOutputStream.write(dataReceived.get(fileIndex).get(i), 100, dataReceived.get(fileIndex).get(i).length - 100);
             }
-            int last = dataReceived.size()-1;
-            fileOutputStream.write(dataReceived.get(last), 0, lastByteLength);
+            int last = dataReceived.get(fileIndex).size()-1;
+            fileOutputStream.write(dataReceived.get(fileIndex).get(last), 100, lastByteLength.get(fileIndex) - 100);
             fileOutputStream.close();
-            System.out.println("File " + fileName + " Received Successfully!");
-            this.fileName = "DefaultFileName";
-            this.lastByteLength = 0;
+            System.out.println("File " + fileNames.get(fileIndex) + " Received Successfully!");
+            fileNames.remove(fileIndex);
+            numberDatagrams.remove(fileIndex);
+            lastByteLength.remove(fileIndex);
+            dataReceived.remove(fileIndex);
+            datagramCounters.remove(fileIndex);
         }catch (Exception ex) {
             errorOnMulticastManager(ex);
         }
@@ -203,25 +206,25 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     
     @Override
     public void dataReceived(String sourceIpAddressOrHost, int sourcePort, byte[] data) {
-        if(!storeData) {
-            //System.out.println("First Datagram Received");
-            String controlString = new String(data);
-            String[] controlData = controlString.split("/");
-            if(controlData[0].equals("P0")) {
-                this.storeData = true;
-                this.fileName = controlData[1];
-                this.numberDatagrams = Integer.parseInt(controlData[2]);
-                this.lastByteLength = Integer.parseInt(controlData[3]);
-                this.dataReceived = new ArrayList<>();
-            }
+        String controlString = new String(data);
+        String[] controlData = controlString.split("/");
+        if(controlData[0].equals("P0")) {
+            this.fileNames.add(controlData[1]);
+            this.numberDatagrams.add(Integer.parseInt(controlData[2]));
+            this.lastByteLength.add(Integer.parseInt(controlData[3]));
+            this.dataReceived.add(new ArrayList<>());
+            this.datagramCounters.add(0);
         }else {
-            dataReceived.add(Arrays.copyOf(data, data.length));
-            datagramCounter++;
-            if(datagramCounter >= numberDatagrams) {
-                this.makeFile();
-                this.storeData = false;
-                this.numberDatagrams = 0;
-                this.datagramCounter = 0;
+            String headerString = new String(Arrays.copyOf(data, 100));
+            String[] headerName = headerString.split("/");
+            if(fileNames.contains(headerName[0])) {
+                int fileIndex = fileNames.indexOf(headerName[0]);
+                dataReceived.get(fileIndex).add(Arrays.copyOf(data, data.length));
+                Integer counter = datagramCounters.get(fileIndex);
+                datagramCounters.set(fileIndex, counter+1);
+                if(datagramCounters.get(fileIndex) >= numberDatagrams.get(fileIndex)) {
+                    this.makeFile(fileIndex);
+                }
             }
         }
     }
@@ -229,6 +232,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     @Override
     public void errorOnMulticastManager(Exception ex) {
         System.err.println(ex);
+        //ex.printStackTrace();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

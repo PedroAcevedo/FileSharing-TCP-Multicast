@@ -25,14 +25,17 @@ public class Downloading extends Thread{
     
     JProgressBar progressBar;
     JTextArea jText;
-    private float increment = 0;
+    private int increment = 0;
     private String filename;
+    private long size;
     HttpURLConnection urlConnection;
 
 
-    public Downloading(JProgressBar bar,String filename) {
+    public Downloading(JProgressBar bar,String filename, long size) {
       this.progressBar = bar;
       this.filename = filename;
+      this.size = size;
+      this.increment = (int)(size/1024);
     }
 
     public Downloading(JTextArea jText, String filename){
@@ -42,20 +45,20 @@ public class Downloading extends Thread{
 
     @Override
     public void run() {
-//      try {
-//          downloadFile(filename);
-//      } catch (IOException ex) {
-//          Logger.getLogger(Downloading.class.getName()).log(Level.SEVERE, null, ex);
-//      }    
-    jText.setText(jText.getText() + "\n" + downloadFiles(filename));
+      try {
+          downloadFile(filename);
+      } catch (IOException ex) {
+          Logger.getLogger(Downloading.class.getName()).log(Level.SEVERE, null, ex);
+      }    
+     //jText.setText(jText.getText() + "\n" + downloadFiles(filename));
 
     }
     
-    public void RefreshProgress(float value)   {
+    public void RefreshProgress(int value)   {
 
         if (this == null) return;
-        progressBar.setValue(progressBar.getValue() + (int)value);
-        System.out.println((int)value);
+        progressBar.setValue((int)value / increment);
+        System.out.println(size);
 
     }
   
@@ -68,16 +71,15 @@ public class Downloading extends Thread{
         if(urlConnection.getResponseCode() / 100 == 2){
             //
             BufferedInputStream in = new BufferedInputStream(url.openStream());
-            float contentLength = in.available();
-            //increment = (float)((100*1024)/contentLength);
             //System.out.println(urlConnection.getHeaderField("Content-length"));
             FileOutputStream fileOutputStream = new FileOutputStream("/home/pedross/Documents/Repositories/FileSharing-TCP-Multicast/WebServiceClient/" + filename);
             byte dataBuffer[] = new byte[1024];
             int bytesRead;
+            int i = 0;
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                fileOutputStream.write(dataBuffer, 0, bytesRead);
-              //this.RefreshProgress(increment);
-               
+               this.RefreshProgress(i);
+               i++;
             }
         }
         } catch (IOException e) {

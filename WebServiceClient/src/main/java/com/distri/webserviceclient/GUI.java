@@ -7,11 +7,13 @@ package com.distri.webserviceclient;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 
 /**
  *
@@ -20,6 +22,7 @@ import javax.swing.JProgressBar;
 public class GUI extends javax.swing.JFrame {
 
     private Request request;
+    FilesList availablesFiles;
     /**
      * Creates new form GUI
      */
@@ -176,7 +179,7 @@ public class GUI extends javax.swing.JFrame {
         if (!jTextField1.getText().isEmpty()) {
         try {
             request = new Request(jTextField1.getText());
-            jList1.setModel(request.filesAvailables());
+            loadFiles();
             jButton1.setEnabled(true);
             jButton2.setEnabled(false);
             jButton3.setEnabled(true);
@@ -198,7 +201,7 @@ public class GUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (jList1.getSelectedValue() != null) {
             String filename = jList1.getSelectedValue();
-            Thread downloadFile = new Downloading(this.jTextArea1,filename);
+            Thread downloadFile = new Downloading(this.jProgressBar1,filename,availablesFiles.getFiles().get(filename));
             downloadFile.start();
             //jTextArea1.setText(jTextArea1.getText());
         }else{
@@ -210,13 +213,23 @@ public class GUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         try {
             jList1.removeAll();
-            jList1.setModel(request.filesAvailables());
+            loadFiles();
             jList1.setEnabled(true);
         } catch (IOException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    public void loadFiles() throws IOException{
+        DefaultListModel listmodel = new DefaultListModel();
+        availablesFiles = request.filesAvailables();
+        Iterator i = availablesFiles.getFiles().keySet().iterator();
+        while(i.hasNext()){
+            listmodel.addElement(i.next().toString());
+        }
+        jList1.setModel(listmodel);
+    }
+    
     /**
      * @param args the command line arguments
      */

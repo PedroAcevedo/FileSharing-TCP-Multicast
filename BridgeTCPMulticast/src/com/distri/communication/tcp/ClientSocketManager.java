@@ -41,16 +41,19 @@ public class ClientSocketManager {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(
                     clientSocket.getOutputStream());
             
-            objectOutputStream.writeObject(file.getName());
+            String fileName = file.getName();
+            objectOutputStream.writeObject(fileName);
+            
+            String header = padding(fileName);
             
             FileInputStream fileInputStream = new FileInputStream(file);
-            byte[] buffer = new byte[MTU];
+            byte[] buffer = new byte[MTU-100];
             
-            //Revisar
             Integer bytesRead = 0;
             while((bytesRead = fileInputStream.read(buffer)) > 0) {
-                objectOutputStream.writeObject(bytesRead);
-                objectOutputStream.writeObject(Arrays.copyOf(buffer, buffer.length));
+                objectOutputStream.writeObject((bytesRead + 100));
+                byte[] dataToBeSent = concatenate(header.getBytes(), buffer);
+                objectOutputStream.writeObject(Arrays.copyOf(dataToBeSent, dataToBeSent.length));
             }
             
             objectOutputStream.close();
@@ -62,6 +65,22 @@ public class ClientSocketManager {
         }catch (Exception ex) {
             System.err.println(ex);
         }
+    }
+    
+    private byte[] concatenate(byte[] header, byte[] data) {
+        byte[] out = new byte[header.length + data.length];
+        System.arraycopy(header, 0, out, 0, header.length);
+        System.arraycopy(data, 0, out, header.length, data.length);  
+        return out;
+    }
+    
+    private String padding(String name) {
+        String out = name;
+        out += "/";
+        while(out.length() < 100) {
+            out += ".";
+        }
+        return out;
     }
     
 }

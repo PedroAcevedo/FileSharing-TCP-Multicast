@@ -16,12 +16,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -97,8 +94,7 @@ public class RequestMethods {
         return A1;
     }
     
-    public ArrayList<String> getAvailablesFiles(String host){
-        ArrayList<String> files = new ArrayList<>();
+    public String getAvailablesFiles(String host){
         try {
             String endpoint="http://"+host+":8080/WebServiceRESTMulticast/webresources/Files";
             URL url=new URL(endpoint);
@@ -108,21 +104,16 @@ public class RequestMethods {
             if(httpResponseCode==HttpURLConnection.HTTP_OK){
                 BufferedReader reader=new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String newLine="";
-                Gson gson = new Gson();
                 if((newLine=reader.readLine()) != null){
-                    Properties filesIn = gson.fromJson(newLine, Properties.class);
-                    String fileList = filesIn.getProperty("Files");
-                    String[] archives = ((String)fileList.subSequence(1, fileList.length()-1)).split(",");
-                    files = new ArrayList<>(Arrays.asList(archives));
+                    return newLine;
                 }
             }
-            return files;
         } catch (Exception e) {
             System.out.println(e);
         }finally {
             urlConnection.disconnect();
         }       
-        return files;
+        return "{}";
     }
      
     public Response getFileFromHost(String hostIP, String filename) throws MalformedURLException, IOException{

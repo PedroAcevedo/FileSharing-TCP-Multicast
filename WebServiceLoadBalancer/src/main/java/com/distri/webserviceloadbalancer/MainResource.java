@@ -5,13 +5,11 @@
  */
 package com.distri.webserviceloadbalancer;
 
+import com.distri.webserviceloadbalancer.methods.FilesList;
 import com.distri.webserviceloadbalancer.methods.RequestMethods;
-import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
+import com.google.gson.Gson;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Set;
 import javax.servlet.ServletContext;
@@ -51,20 +49,17 @@ public class MainResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson() {
-        
         hosts = r.whoIsThere(servletContext.getRealPath("/") + "/../../hosts.txt");//new ArrayList<>();//
-        ArrayList<String> files = new ArrayList<>();
+        FilesList files = new FilesList();
         for(String host : hosts){
-            ArrayList<String> filesInHost = r.getAvailablesFiles(host);
-            if (!filesInHost.isEmpty()) {
-                if (files.isEmpty()) {
-                    files = filesInHost;
-                }else{
-                    files = r.selectDistinct(files, r.getAvailablesFiles(host));
-                }   
-            } 
+            Gson gson = new Gson();
+            if (files.isEmpty()) {
+                files = gson.fromJson(r.getAvailablesFiles(host), FilesList.class);
+            }else{
+                files.addNewFiles(r.getAvailablesFiles(host));
+            }
         }
-        return "{\"Files\":\""+ files +"\"}";
+        return "{\"Files\":"+ files.toJson() +"}";
     }
     
     @GET

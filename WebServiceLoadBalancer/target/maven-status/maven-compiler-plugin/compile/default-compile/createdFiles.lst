@@ -1,4 +1,5 @@
 com/distri/webserviceloadbalancer/methods/RoundRobin.class
 com/distri/webserviceloadbalancer/MainResource.class
 com/distri/webserviceloadbalancer/methods/RequestMethods.class
+com/distri/webserviceloadbalancer/methods/FilesList.class
 com/distri/webserviceloadbalancer/ApplicationConfig.class
