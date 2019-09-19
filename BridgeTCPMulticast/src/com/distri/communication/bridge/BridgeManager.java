@@ -10,11 +10,19 @@ import com.distri.communication.multicast.MulticastManagerCallerInterface;
 import com.distri.communication.tcp.TCPServiceManager;
 import com.distri.communication.tcp.TCPServiceManagerCallerInterface;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -109,7 +117,34 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
 
     @Override
     public void dataReceived(String sourceIpAddressOrHost, int sourcePort, byte[] data) {
+        String controlString = new String(data);
+        String[] controlData = controlString.split("/");
         
+        if(controlData[0].equals("HI")) {
+            try (BufferedReader br = new BufferedReader(new FileReader("../WebServiceLoadBalancer/hosts.txt"))) {
+
+                String strCurrentLine;
+                while ((strCurrentLine = br.readLine()) != null) {
+                    if (strCurrentLine.equals(controlData[1])){
+                        return;
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println(e);
+            }
+            try(FileWriter fw = new FileWriter("../WebServiceLoadBalancer/hosts.txt", true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw))
+            {
+                out.println(controlData[1]);
+                out.close();
+                fw.close();
+                System.out.println(controlData[1] + " added to the hosts.txt file");
+            } catch (IOException e) {
+                System.err.println(e);
+            }
+           
+        }
     }
 
     @Override

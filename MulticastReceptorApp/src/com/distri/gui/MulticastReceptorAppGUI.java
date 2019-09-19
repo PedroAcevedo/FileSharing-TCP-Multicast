@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -179,6 +180,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
             if(multicastManager == null) {
                 multicastManager = new MulticastManager(ipTextField.getText(), 
                         Integer.parseInt(portTextField.getText()), this, MulticastReceptorAppGUI.MTU);
+                multicastManager.sendData(("HI/" + InetAddress.getLocalHost().getHostAddress()).getBytes());
                 return true;
             }
         }catch (Exception ex) {
