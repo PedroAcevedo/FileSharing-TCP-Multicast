@@ -11,11 +11,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.Action;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JProgressBar;
-import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -24,42 +23,57 @@ import javax.swing.JTextArea;
 public class Downloading extends Thread{
     
     JProgressBar progressBar;
-    JTextArea jText;
-    private int increment = 0;
+    JList jText;
+    private double increment;
     private String filename;
-    private long size;
+    private double size;
+    double d = (double)(1024*100);
     HttpURLConnection urlConnection;
 
 
-    public Downloading(JProgressBar bar,String filename, long size) {
+    public Downloading(JProgressBar bar,String filename, double size) {
       this.progressBar = bar;
       this.filename = filename;
       this.size = size;
-      this.increment = (int)(size/1024);
+      System.out.println(size);
+      this.increment = (double)(d/size);
     }
 
-    public Downloading(JTextArea jText, String filename){
+    public Downloading(JList jText, String filename){
         this.jText = jText;
         this.filename = filename;
     }
 
     @Override
     public void run() {
-      try {
-          downloadFile(filename);
-      } catch (IOException ex) {
-          Logger.getLogger(Downloading.class.getName()).log(Level.SEVERE, null, ex);
-      }    
-     //jText.setText(jText.getText() + "\n" + downloadFiles(filename));
+//      try {
+//          downloadFile(filename);
+//      } catch (IOException ex) {
+//          Logger.getLogger(Downloading.class.getName()).log(Level.SEVERE, null, ex);
+//      }    
+    String file = downloadFiles(filename);
+    DefaultListModel l = new DefaultListModel();
+    l.addElement(file);
+    jText.setModel(l);
 
     }
     
-    public void RefreshProgress(int value)   {
-
-        if (this == null) return;
-        progressBar.setValue((int)value / increment);
-        System.out.println(size);
-
+    
+    
+    public synchronized void RefreshProgress(long value)   {
+        
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                if (this == null) return;
+                increment = (double)increment*(value);
+                progressBar.setValue((int)increment);
+                System.out.println(increment);
+              }
+            });
+            return;
+        }
     }
   
     public void downloadFile(String filename) throws MalformedURLException, IOException{     
@@ -75,7 +89,7 @@ public class Downloading extends Thread{
             FileOutputStream fileOutputStream = new FileOutputStream("/home/pedross/Documents/Repositories/FileSharing-TCP-Multicast/WebServiceClient/" + filename);
             byte dataBuffer[] = new byte[1024];
             int bytesRead;
-            int i = 0;
+            long i = 0;
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                fileOutputStream.write(dataBuffer, 0, bytesRead);
                this.RefreshProgress(i);

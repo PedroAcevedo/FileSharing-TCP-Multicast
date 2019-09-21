@@ -77,7 +77,7 @@ public class RequestMethods {
     public void updateHost() throws IOException{
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             for (String host : serverWeightMap.keySet()){
-                writer.write(host);
+                writer.write(host + "\n");
             }
             writer.close();
         }
@@ -116,10 +116,15 @@ public class RequestMethods {
         return "{}";
     }
      
-    public Response getFileFromHost(String hostIP, String filename) throws MalformedURLException, IOException{
+    public Response getFileFromHost(String hostIP, String filename){
        String endpoint="http://"+hostIP+":8080/WebServiceRESTMulticast/webresources/download/service-record/" + filename;
-       return Response.ok(new URL(endpoint).openStream(), MediaType.APPLICATION_OCTET_STREAM)
-       .build(); 
+        try {
+            return Response.ok(new URL(endpoint).openStream(), MediaType.APPLICATION_OCTET_STREAM)
+            .build();    
+        } catch (IOException e) {
+            System.err.println(e);
+        }
+        return Response.serverError().build();
     }
     
     public Response failovering(String filename) throws IOException{

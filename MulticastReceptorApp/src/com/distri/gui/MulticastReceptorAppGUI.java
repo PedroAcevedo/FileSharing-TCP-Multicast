@@ -7,6 +7,7 @@ package com.distri.gui;
 
 import com.distri.communication.multicast.MulticastManager;
 import com.distri.communication.multicast.MulticastManagerCallerInterface;
+import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,8 +35,8 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     ArrayList<Integer> numberDatagrams;
     ArrayList<Integer> lastByteLength;
     ArrayList<ArrayList<byte[]>> dataReceived;
-    
     ArrayList<Integer> datagramCounters;
+    boolean isReported = false;
     
     /**
      * Creates new form MulticastReceptorAppGUI
@@ -55,7 +56,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         try {
             MulticastReceptorAppGUI.MTU = Integer.parseInt(
                     (new BufferedReader(new FileReader(
-                            Paths.get("src\\com\\distri\\resources\\config\\MTU.config").toAbsolutePath().toString())
+                            Paths.get("src/com/distri/resources/config/MTU.config").toAbsolutePath().toString())
                     )).readLine()
             );
         }catch (Exception ex) {
@@ -180,7 +181,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
             if(multicastManager == null) {
                 multicastManager = new MulticastManager(ipTextField.getText(), 
                         Integer.parseInt(portTextField.getText()), this, MulticastReceptorAppGUI.MTU);
-                multicastManager.sendData(("HI/" + InetAddress.getLocalHost().getHostAddress()).getBytes());
+                multicastManager.sendData(("HI/" + InetAddress.getLocalHost().getHostAddress() + "/").getBytes());
                 return true;
             }
         }catch (Exception ex) {
@@ -214,6 +215,10 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     public void dataReceived(String sourceIpAddressOrHost, int sourcePort, byte[] data) {
         String controlString = new String(data);
         String[] controlData = controlString.split("/");
+//        if (!isReported) {
+//            System.out.println(sourceIpAddressOrHost);
+//            System.out.println(String.valueOf(data));
+//        }
         if(controlData[0].equals("P0")) {
             this.fileNames.add(controlData[1]);
             this.numberDatagrams.add(Integer.parseInt(controlData[2]));
@@ -240,6 +245,8 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
                     Integer counter = datagramCounters.get(fileIndex);
                     datagramCounters.set(fileIndex, counter+1);
                     if(datagramCounters.get(fileIndex) >= numberDatagrams.get(fileIndex)) {
+                        System.out.println("file writing stated...");
+                        Toolkit.getDefaultToolkit().beep();
                         this.makeFile(fileIndex);
                     }
                 }

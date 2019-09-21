@@ -43,12 +43,12 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
         try {
             BridgeManager.MTU = Integer.parseInt(
                     (new BufferedReader(new FileReader(
-                            Paths.get("src\\com\\distri\\resources\\config\\MTU.config").toAbsolutePath().toString())
+                            Paths.get("src/com/distri/resources/config/MTU.config").toAbsolutePath().toString())
                     )).readLine()
             );
             this.tcpServiceManager = new TCPServiceManager(this);
-            this.multicastManager = new MulticastManager("224.0.0.1", 9091, this, BridgeManager.MTU);
-            sendString("C0/"+ BridgeManager.MTU+"/basura");
+            this.multicastManager = new MulticastManager("224.0.0.10", 9091, this, BridgeManager.MTU);
+            //sendString("C0/"+ BridgeManager.MTU+"/basura");
         }catch (Exception ex) {
             System.err.println(ex);
         }

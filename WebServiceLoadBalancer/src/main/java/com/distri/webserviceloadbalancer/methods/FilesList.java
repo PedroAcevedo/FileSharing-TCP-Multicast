@@ -45,7 +45,12 @@ public class FilesList {
             String file = i.next().toString();
             json = json + "\"" + file + "\":" + Files.get(file) + ",";
         }
-        json = json.subSequence(0, json.length()-1) + "}";
+        if (!json.equals("{")) {
+            json = json.subSequence(0, json.length()-1) + "}";
+        }else{
+            json  = json + "}";
+        }
+
         return json;
     }
     

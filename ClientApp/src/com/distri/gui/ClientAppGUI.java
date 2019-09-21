@@ -38,7 +38,7 @@ public class ClientAppGUI extends javax.swing.JFrame {
         try {
             ClientAppGUI.MTU = Integer.parseInt(
                     (new BufferedReader(new FileReader(
-                            Paths.get("src\\com\\distri\\resources\\config\\MTU.config").toAbsolutePath().toString())
+                            Paths.get("src/com/distri/resources/config/MTU.config").toAbsolutePath().toString())
                     )).readLine()
             );
         }catch (Exception ex) {

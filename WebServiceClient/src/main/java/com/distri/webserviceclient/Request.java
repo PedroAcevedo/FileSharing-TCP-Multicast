@@ -41,8 +41,10 @@ public class Request {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line = "";
             Gson gson = new Gson();
-            while ((line = reader.readLine()) != null) {
-                map = gson.fromJson(line, FilesList.class);
+            while ((line = reader.readLine()) != null){
+                if (!line.equals("{ \"Files\":{}}")) {
+                    map = gson.fromJson(line, FilesList.class);
+                }     
             }
             urlConnection.disconnect();   
         }

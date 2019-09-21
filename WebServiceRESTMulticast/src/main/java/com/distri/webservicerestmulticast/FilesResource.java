@@ -61,7 +61,11 @@ public class FilesResource {
         for (int i = 0; i < listOfFiles.length; i++) {
             Files = Files + "\"" +  listOfFiles[i].getName() + "\":" + listOfFiles[i].length() +","; 
         }
-        Files = "{" + Files.substring(0, Files.length()-1) + "}";
+        if (Files.length() > 0) {
+            Files = "{" + Files.substring(0, Files.length()-1) + "}";
+        }else{
+            Files = "{}";
+        }
         return Files;
 
     }

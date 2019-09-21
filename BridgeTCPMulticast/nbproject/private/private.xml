@@ -3,13 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/carlos/Documents/JAVA/FileSharing-TCP-Multicast/BridgeTCPMulticast/src/com/distri/communication/bridge/BridgeManager.java</file>
-            <file>file:/C:/Users/carlos/Documents/JAVA/FileSharing-TCP-Multicast/BridgeTCPMulticast/src/com/distri/communication/tcp/ClientSocketManager.java</file>
-            <file>file:/C:/Users/carlos/Documents/JAVA/FileSharing-TCP-Multicast/BridgeTCPMulticast/src/com/distri/communication/multicast/MulticastManagerCallerInterface.java</file>
-            <file>file:/C:/Users/carlos/Documents/JAVA/FileSharing-TCP-Multicast/BridgeTCPMulticast/src/com/distri/resources/config/MTU.config</file>
-            <file>file:/C:/Users/carlos/Documents/JAVA/FileSharing-TCP-Multicast/BridgeTCPMulticast/src/com/distri/communication/multicast/MulticastManager.java</file>
-            <file>file:/C:/Users/carlos/Documents/JAVA/FileSharing-TCP-Multicast/BridgeTCPMulticast/src/com/distri/communication/tcp/TCPServiceManager.java</file>
-            <file>file:/C:/Users/carlos/Documents/JAVA/FileSharing-TCP-Multicast/BridgeTCPMulticast/src/com/distri/communication/tcp/TCPServiceManagerCallerInterface.java</file>
+            <file>file:/C:/Users/carlos/Documents/JAVA/FileSharing-TCP-Multicast-1000/BridgeTCPMulticast/src/com/distri/communication/bridge/BridgeManager.java</file>
         </group>
     </open-files>
 </project-private>
