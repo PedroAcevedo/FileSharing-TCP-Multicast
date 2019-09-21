@@ -48,8 +48,9 @@ public class ClientAppGUI extends javax.swing.JFrame {
     
     private void searchFile() {
         JFileChooser file = new JFileChooser();
-        file.showOpenDialog(this);
-        selectedFile = file.getSelectedFile();
+        if(file.showOpenDialog(this) == JFileChooser.APPROVE_OPTION){
+            selectedFile = file.getSelectedFile();
+        }
     }
     
     /**

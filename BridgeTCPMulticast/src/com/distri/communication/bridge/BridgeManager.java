@@ -33,23 +33,20 @@ import java.util.Arrays;
 public class BridgeManager implements TCPServiceManagerCallerInterface, MulticastManagerCallerInterface {
     
     public static int MTU;
-    
+    private final String CONFIG_PATH="src/com/distri/resources/config/Bridge.config";
+    private final String HOSTS_PATH="../WebServiceLoadBalancer/hosts.txt";
     TCPServiceManager tcpServiceManager;
     MulticastManager multicastManager;
-    
     ArrayList<byte[]> dataToBeSent;
     
     public BridgeManager() {
         try {
-            BridgeManager.MTU = Integer.parseInt(
-                    (new BufferedReader(new FileReader(
-                            Paths.get("src/com/distri/resources/config/MTU.config").toAbsolutePath().toString())
-                    )).readLine()
-            );
+            BridgeManager.MTU = Integer.parseInt(readConfigFile("MTU",CONFIG_PATH));
             this.tcpServiceManager = new TCPServiceManager(this);
-            this.multicastManager = new MulticastManager("224.0.0.10", 9091, this, BridgeManager.MTU);
+            this.multicastManager = new MulticastManager(readConfigFile("MulticastNetworkIP",CONFIG_PATH), 
+                    Integer.parseInt(readConfigFile("Port", CONFIG_PATH)), this, BridgeManager.MTU);
             //sendString("C0/"+ BridgeManager.MTU+"/basura");
-        }catch (Exception ex) {
+        }catch (NumberFormatException ex) {
             System.err.println(ex);
         }
     }
@@ -57,7 +54,21 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
     public static void main(String[] args) {
         new BridgeManager();
     }
-
+    
+    private String readConfigFile(String parameter, String PATH){
+        try (BufferedReader br = new BufferedReader(new FileReader(PATH))) {
+            String strCurrentLine;
+            while ((strCurrentLine = br.readLine()) != null) {
+                if (strCurrentLine.startsWith(parameter)){
+                    return strCurrentLine.split("=")[1];
+                }
+            }
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+        return null;
+    } 
+    
     @Override
     public void reSendFileReceivedFromClient(Socket clientSocket) {
         try {
@@ -121,7 +132,8 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
         String[] controlData = controlString.split("/");
         
         if(controlData[0].equals("HI")) {
-            try (BufferedReader br = new BufferedReader(new FileReader("../WebServiceLoadBalancer/hosts.txt"))) {
+            System.out.println(controlData[1] + " joined multicast group");
+            try (BufferedReader br = new BufferedReader(new FileReader(HOSTS_PATH))) {
 
                 String strCurrentLine;
                 while ((strCurrentLine = br.readLine()) != null) {
@@ -143,13 +155,12 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
             } catch (IOException e) {
                 System.err.println(e);
             }
-           
         }
     }
 
     @Override
     public void errorOnMulticastManager(Exception ex) {
-        System.err.println(ex);
+        System.err.println(ex.getMessage());
     }
 
     @Override

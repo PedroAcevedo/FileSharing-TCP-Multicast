@@ -181,7 +181,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
             if(multicastManager == null) {
                 multicastManager = new MulticastManager(ipTextField.getText(), 
                         Integer.parseInt(portTextField.getText()), this, MulticastReceptorAppGUI.MTU);
-                multicastManager.sendData(("HI/" + InetAddress.getLocalHost().getHostAddress() + "/").getBytes());
+                //multicastManager.sendData(("HI/" + InetAddress.getLocalHost().getHostAddress() + "/").getBytes());
                 return true;
             }
         }catch (Exception ex) {
@@ -215,40 +215,29 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     public void dataReceived(String sourceIpAddressOrHost, int sourcePort, byte[] data) {
         String controlString = new String(data);
         String[] controlData = controlString.split("/");
-//        if (!isReported) {
-//            System.out.println(sourceIpAddressOrHost);
-//            System.out.println(String.valueOf(data));
-//        }
         if(controlData[0].equals("P0")) {
             this.fileNames.add(controlData[1]);
             this.numberDatagrams.add(Integer.parseInt(controlData[2]));
             this.lastByteLength.add(Integer.parseInt(controlData[3]));
             this.dataReceived.add(new ArrayList<>());
             this.datagramCounters.add(0);
+            System.out.println("starting receiving file...");
+            
         }else{
-            //System.out.println(controlData.equals("C0"));
-            if(controlData[0].equals("C0") && MulticastReceptorAppGUI.MTU != Integer.parseInt(controlData[1])){
-                try {
-                    FileWriter MTUupdater = new FileWriter("src\\com\\distri\\resources\\config\\MTU.config");
-                    MTUupdater.write(controlData[1]);
-                    MTUupdater.close();
-                    System.out.println("MTU updated...");
-                } catch (IOException ex) {
-                    Logger.getLogger(MulticastReceptorAppGUI.class.getName()).log(Level.SEVERE, null, ex);
+            String headerString = new String(Arrays.copyOf(data, 100));
+            String[] headerName = headerString.split("/");
+            if(fileNames.contains(headerName[0])) {
+                int fileIndex = fileNames.indexOf(headerName[0]);
+                dataReceived.get(fileIndex).add(Arrays.copyOf(data, data.length));
+                Integer counter = datagramCounters.get(fileIndex);
+                datagramCounters.set(fileIndex, counter+1);
+                if(counter%2000==0){
+                    System.out.println("datagram : " + counter);
                 }
-            }else {
-                String headerString = new String(Arrays.copyOf(data, 100));
-                String[] headerName = headerString.split("/");
-                if(fileNames.contains(headerName[0])) {
-                    int fileIndex = fileNames.indexOf(headerName[0]);
-                    dataReceived.get(fileIndex).add(Arrays.copyOf(data, data.length));
-                    Integer counter = datagramCounters.get(fileIndex);
-                    datagramCounters.set(fileIndex, counter+1);
-                    if(datagramCounters.get(fileIndex) >= numberDatagrams.get(fileIndex)) {
-                        System.out.println("file writing stated...");
-                        Toolkit.getDefaultToolkit().beep();
-                        this.makeFile(fileIndex);
-                    }
+                if(datagramCounters.get(fileIndex) >= numberDatagrams.get(fileIndex)) {
+                    System.out.println("file writing started...");
+                    //Toolkit.getDefaultToolkit().beep();
+                    this.makeFile(fileIndex);
                 }
             }
         }
@@ -256,7 +245,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
 
     @Override
     public void errorOnMulticastManager(Exception ex) {
-        System.err.println(ex);
+        System.err.println(ex.getMessage());
         //ex.printStackTrace();
     }
 
