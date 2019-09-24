@@ -71,6 +71,7 @@ public class ClientAppGUI extends javax.swing.JFrame {
         fileTextField = new javax.swing.JTextField();
         browserButton = new javax.swing.JButton();
         sendButton = new javax.swing.JButton();
+        jProgressBar1 = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -108,21 +109,23 @@ public class ClientAppGUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(browserButton)
                         .addGap(35, 35, 35))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGap(124, 124, 124)
+                        .addComponent(sendButton)
+                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel3)
                             .addComponent(jLabel2)
                             .addComponent(jLabel1))
                         .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(ipTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
-                            .addComponent(portTextField)
-                            .addComponent(fileTextField))
-                        .addGap(192, 192, 192))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(124, 124, 124)
-                        .addComponent(sendButton)
-                        .addContainerGap())))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(ipTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                                .addComponent(portTextField)
+                                .addComponent(fileTextField)))
+                        .addGap(192, 192, 192))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -142,7 +145,9 @@ public class ClientAppGUI extends javax.swing.JFrame {
                     .addComponent(browserButton))
                 .addGap(46, 46, 46)
                 .addComponent(sendButton)
-                .addContainerGap(83, Short.MAX_VALUE))
+                .addGap(28, 28, 28)
+                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(41, Short.MAX_VALUE))
         );
 
         pack();
@@ -210,6 +215,7 @@ public class ClientAppGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JTextField portTextField;
     private javax.swing.JButton sendButton;
     // End of variables declaration//GEN-END:variables

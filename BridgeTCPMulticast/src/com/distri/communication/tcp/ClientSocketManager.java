@@ -43,7 +43,7 @@ public class ClientSocketManager {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(
                     clientSocket.getOutputStream());
             
-            String fileHeader = padding(file.getName());
+            String fileHeader = padding(file.getName().strip());
             objectOutputStream.writeObject(fileHeader);
             objectOutputStream.flush();
             FileInputStream fileInputStream = new FileInputStream(file);

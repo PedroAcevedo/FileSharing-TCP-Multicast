@@ -7,14 +7,11 @@ package com.distri.gui;
 
 import com.distri.communication.multicast.MulticastManager;
 import com.distri.communication.multicast.MulticastManagerCallerInterface;
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
@@ -200,7 +197,6 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
             fileOutputStream = new FileOutputStream(new File(path + "\\" + fileName));
             for (int i = 0; i < data.size()-1; i++) {
                 fileOutputStream.write(Arrays.copyOf(data.get(i),data.get(i).length));
-                //fileOutputStream.flush();
             }
             fileOutputStream.write(Arrays.copyOf(data.get(data.size()-1),data.get(data.size()-1).length), 0, lastBytesCount);
             fileOutputStream.close();
@@ -256,8 +252,6 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         }
     }
     
-    
-
     @Override
     public void errorOnMulticastManager(Exception ex) {
         System.err.println(ex.getMessage());
