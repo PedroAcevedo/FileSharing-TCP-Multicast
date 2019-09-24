@@ -199,10 +199,10 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
             String path = System.getProperty("user.dir") + "/../WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources";
             fileOutputStream = new FileOutputStream(new File(path + "\\" + fileName));
             for (int i = 0; i < data.size()-1; i++) {
-                fileOutputStream.write(data.get(i), 100, data.get(i).length - 100);
-                fileOutputStream.flush();
+                fileOutputStream.write(Arrays.copyOf(data.get(i),data.get(i).length));
+                //fileOutputStream.flush();
             }
-            fileOutputStream.write(data.get(data.size()-1), 100, lastBytesCount);
+            fileOutputStream.write(Arrays.copyOf(data.get(data.size()-1),data.get(data.size()-1).length), 0, lastBytesCount);
             fileOutputStream.close();
             fileOutputStream.close();
             System.out.println("file : " + fileName + " Successfully written!!");
@@ -218,7 +218,8 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
             String path = System.getProperty("user.dir") + "/../WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources";
             FileOutputStream fileOutputStream = new FileOutputStream(new File(path + "\\" + fileNames.get(fileIndex)));
             for (int i = 0; i < dataReceived.get(fileIndex).size()-1; i++) {
-                fileOutputStream.write(dataReceived.get(fileIndex).get(i), 100, dataReceived.get(fileIndex).get(i).length - 100);
+                
+                fileOutputStream.write(dataReceived.get(fileIndex).get(i),0, dataReceived.get(fileIndex).get(i).length - 100);
             }
             int last = dataReceived.get(fileIndex).size()-1;
             fileOutputStream.write(dataReceived.get(fileIndex).get(last), 100, lastByteLength.get(fileIndex) - 100);
@@ -250,7 +251,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
                 break;
             default:
                 if(fileDescriptors.containsKey(controlData[0])){
-                    fileDescriptors.get(controlData[0]).addData(data);
+                    fileDescriptors.get(controlData[0]).addData(Arrays.copyOfRange(data,100,data.length));
                 }
         }
     }

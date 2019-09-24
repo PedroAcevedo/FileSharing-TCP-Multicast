@@ -9,6 +9,7 @@ import com.distri.communication.tcp.ClientSocketManager;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,7 +42,7 @@ public class ClientAppGUI extends javax.swing.JFrame {
                             Paths.get("src/com/distri/resources/config/MTU.config").toAbsolutePath().toString())
                     )).readLine()
             );
-        }catch (Exception ex) {
+        }catch (IOException | NumberFormatException ex) {
             System.err.println(ex);
         }
     }
@@ -161,7 +162,7 @@ public class ClientAppGUI extends javax.swing.JFrame {
                         Integer.parseInt(portTextField.getText()), ClientAppGUI.MTU);
                 new Thread(() -> clientSocket.uploadFile(selectedFile)).start();
                 
-            }catch (Exception ex) {
+            }catch (NumberFormatException ex) {
                 Logger.getLogger(ClientAppGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else {
@@ -197,10 +198,8 @@ public class ClientAppGUI extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ClientAppGUI().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new ClientAppGUI().setVisible(true);
         });
     }
 

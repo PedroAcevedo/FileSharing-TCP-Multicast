@@ -52,22 +52,20 @@ public class ClientSocketManager {
             //int packetCounter = 0;
             int aux = 0;
             while((bytesRead = fileInputStream.read(buffer)) != -1) {
-                //packetCounter++;
-                //objectOutputStream.writeObject((bytesRead + 100));
                 if(bytesRead > 0){
                     aux = bytesRead;
                 }
                 byte[] dataToBeSent = concatenate(fileHeader.getBytes(), buffer);
                 objectOutputStream.writeObject(Arrays.copyOf(dataToBeSent, dataToBeSent.length));
                 objectOutputStream.flush();
-                wait(6);
+                wait(3);
             }
             objectOutputStream.writeObject("EOF/"+ fileHeader.split("/")[0] + "/" + aux + "/");
             objectOutputStream.close();
             objectInputStream.close();
             fileInputStream.close();
             
-            System.out.println("File uploaded successfully!");
+            System.out.println("File uploaded successfully!... or not?");
             System.exit(0);
             
         }catch(IOException e){
