@@ -159,7 +159,8 @@ public class ClientAppGUI extends javax.swing.JFrame {
             try {
                 clientSocket = new ClientSocketManager(selectedFile, ipTextField.getText(),
                         Integer.parseInt(portTextField.getText()), ClientAppGUI.MTU);
-                clientSocket.uploadFile();
+                new Thread(() -> clientSocket.uploadFile(selectedFile)).start();
+                
             }catch (Exception ex) {
                 Logger.getLogger(ClientAppGUI.class.getName()).log(Level.SEVERE, null, ex);
             }

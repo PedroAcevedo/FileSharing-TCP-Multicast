@@ -14,6 +14,7 @@ import java.net.Socket;
 public interface TCPServiceManagerCallerInterface {
     
     void reSendFileReceivedFromClient(Socket clientSocket);
+    void reSend(Socket cientSocket);
     void errorOnTCPServiceManager(Exception ex);
     
 }

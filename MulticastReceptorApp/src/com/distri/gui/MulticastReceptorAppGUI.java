@@ -7,9 +7,11 @@ package com.distri.gui;
 
 import com.distri.communication.multicast.MulticastManager;
 import com.distri.communication.multicast.MulticastManagerCallerInterface;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -19,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +40,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     ArrayList<ArrayList<byte[]>> dataReceived;
     ArrayList<Integer> datagramCounters;
     boolean isReported = false;
-    
+    HashMap<String, fileDescriptor> fileDescriptors;
     /**
      * Creates new form MulticastReceptorAppGUI
      */
@@ -50,6 +53,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         this.lastByteLength = new ArrayList<>();
         this.dataReceived = new ArrayList<>();
         this.datagramCounters = new ArrayList<>();
+        this.fileDescriptors = new HashMap();
     }
 
     private void configMTU() {
@@ -189,7 +193,26 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         }
         return false;
     }
-    
+    private void makeFile(ArrayList<byte[]> data, String fileName, int lastBytesCount){
+        FileOutputStream fileOutputStream = null;
+        try {
+            String path = System.getProperty("user.dir") + "/../WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources";
+            fileOutputStream = new FileOutputStream(new File(path + "\\" + fileName));
+            for (int i = 0; i < data.size()-1; i++) {
+                fileOutputStream.write(data.get(i), 100, data.get(i).length - 100);
+                fileOutputStream.flush();
+            }
+            fileOutputStream.write(data.get(data.size()-1), 100, lastBytesCount);
+            fileOutputStream.close();
+            fileOutputStream.close();
+            System.out.println("file : " + fileName + " Successfully written!!");
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MulticastReceptorAppGUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MulticastReceptorAppGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     private void makeFile(int fileIndex) {
         try {
             String path = System.getProperty("user.dir") + "/../WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources";
@@ -213,35 +236,26 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     
     @Override
     public void dataReceived(String sourceIpAddressOrHost, int sourcePort, byte[] data) {
+        
         String controlString = new String(data);
         String[] controlData = controlString.split("/");
-        if(controlData[0].equals("P0")) {
-            this.fileNames.add(controlData[1]);
-            this.numberDatagrams.add(Integer.parseInt(controlData[2]));
-            this.lastByteLength.add(Integer.parseInt(controlData[3]));
-            this.dataReceived.add(new ArrayList<>());
-            this.datagramCounters.add(0);
-            System.out.println("starting receiving file...");
-            
-        }else{
-            String headerString = new String(Arrays.copyOf(data, 100));
-            String[] headerName = headerString.split("/");
-            if(fileNames.contains(headerName[0])) {
-                int fileIndex = fileNames.indexOf(headerName[0]);
-                dataReceived.get(fileIndex).add(Arrays.copyOf(data, data.length));
-                Integer counter = datagramCounters.get(fileIndex);
-                datagramCounters.set(fileIndex, counter+1);
-                if(counter%2000==0){
-                    System.out.println("datagram : " + counter);
+        switch(controlData[0]) {
+            case "NEW":
+                System.out.println("receiving file...");
+                fileDescriptors.put(controlData[1], new fileDescriptor(controlData[1]));
+                break;
+            case "EOF":
+                fileDescriptor f = fileDescriptors.remove(controlData[1]);
+                makeFile(f.dataList, f.fileName,Integer.parseInt(controlData[2]));
+                break;
+            default:
+                if(fileDescriptors.containsKey(controlData[0])){
+                    fileDescriptors.get(controlData[0]).addData(data);
                 }
-                if(datagramCounters.get(fileIndex) >= numberDatagrams.get(fileIndex)) {
-                    System.out.println("file writing started...");
-                    //Toolkit.getDefaultToolkit().beep();
-                    this.makeFile(fileIndex);
-                }
-            }
         }
     }
+    
+    
 
     @Override
     public void errorOnMulticastManager(Exception ex) {
@@ -260,5 +274,22 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     @Override
     public void sendString(String data) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
+    class fileDescriptor{
+        //int lastBytesCount;
+        ArrayList<byte[]> dataList;
+        String fileName;
+        
+        public fileDescriptor(String fileName){
+            this.dataList = new ArrayList();
+            this.fileName = fileName;
+            //this.lastBytesCount = lastBytesCount;
+        }
+        
+        public void addData(byte[] data){
+            this.dataList.add(data);
+        }
     }
 }

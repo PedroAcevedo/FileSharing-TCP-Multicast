@@ -32,7 +32,7 @@ public class TCPServiceManager extends Thread {
             System.out.println("Server is up...");
             while(isEnable) {
                 Socket clientSocket = serverSocket.accept();
-                caller.reSendFileReceivedFromClient(clientSocket);
+                caller.reSend(clientSocket);
             }
         }catch (Exception ex) {
             caller.errorOnTCPServiceManager(ex);

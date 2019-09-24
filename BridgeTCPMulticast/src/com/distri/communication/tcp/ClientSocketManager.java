@@ -7,10 +7,13 @@ package com.distri.communication.tcp;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -28,6 +31,50 @@ public class ClientSocketManager {
         this.serverIpAddress = serverIpAddress;
         this.port = port;
         this.MTU = MTU;
+    }
+    
+    public synchronized void uploadFile(File file){
+        try{
+            System.out.println("uploading file...");
+            Socket clientSocket = new Socket(serverIpAddress, port);
+            
+            ObjectInputStream objectInputStream = new ObjectInputStream(
+                    clientSocket.getInputStream());
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(
+                    clientSocket.getOutputStream());
+            
+            String fileHeader = padding(file.getName());
+            objectOutputStream.writeObject(fileHeader);
+            objectOutputStream.flush();
+            FileInputStream fileInputStream = new FileInputStream(file);
+            byte[] buffer = new byte[MTU-100];
+            int bytesRead = 0;
+            //int packetCounter = 0;
+            int aux = 0;
+            while((bytesRead = fileInputStream.read(buffer)) != -1) {
+                //packetCounter++;
+                //objectOutputStream.writeObject((bytesRead + 100));
+                if(bytesRead > 0){
+                    aux = bytesRead;
+                }
+                byte[] dataToBeSent = concatenate(fileHeader.getBytes(), buffer);
+                objectOutputStream.writeObject(Arrays.copyOf(dataToBeSent, dataToBeSent.length));
+                objectOutputStream.flush();
+                wait(6);
+            }
+            objectOutputStream.writeObject("EOF/"+ fileHeader.split("/")[0] + "/" + aux + "/");
+            objectOutputStream.close();
+            objectInputStream.close();
+            fileInputStream.close();
+            
+            System.out.println("File uploaded successfully!");
+            System.exit(0);
+            
+        }catch(IOException e){
+            System.err.println(e.getMessage());
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ClientSocketManager.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
     
     public void uploadFile() {

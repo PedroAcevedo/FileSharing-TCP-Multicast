@@ -25,6 +25,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -49,6 +51,40 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
         }catch (NumberFormatException ex) {
             System.err.println(ex);
         }
+    }
+    
+    @Override
+    public void reSend(Socket clientSocket){
+        String nameFile = "";
+        Object object = null;
+        ObjectOutputStream objectOutputStream = null;
+        ObjectInputStream objectInputStream = null;
+        try{
+            objectOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+            objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
+            object = objectInputStream.readObject();
+            if(object instanceof String) {
+                nameFile = object.toString().split("/")[0];
+                multicastManager.sendData(("NEW/"+nameFile + "/").getBytes());
+                System.out.println("receiving file...");
+            }
+            while(true){
+                object = objectInputStream.readObject();
+                if(object instanceof byte[]){
+                    String aux = new String((byte[])object);
+                    multicastManager.sendData(Arrays.copyOf((byte[])object, ((byte[])object).length));
+                }else if(object instanceof String){
+                    multicastManager.sendData(((String) object).getBytes());
+                    objectOutputStream.close();
+                    objectInputStream.close();
+                    System.out.println("File: " + nameFile + " resent successfully!");
+                    return;
+                }
+            }
+        }catch(IOException | ClassNotFoundException e){
+            System.err.println(e.getMessage());
+        }
+        
     }
     
     public static void main(String[] args) {
@@ -167,5 +203,7 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
     public void sendString(String data) {
         multicastManager.sendData(data.getBytes());
     }
+
+    
     
 }
