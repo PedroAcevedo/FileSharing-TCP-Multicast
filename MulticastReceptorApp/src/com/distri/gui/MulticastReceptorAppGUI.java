@@ -196,9 +196,9 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
             String path = System.getProperty("user.dir") + "/../WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources";
             fileOutputStream = new FileOutputStream(new File(path + "\\" + fileName));
             for (int i = 0; i < data.size()-1; i++) {
-                fileOutputStream.write(Arrays.copyOf(data.get(i),data.get(i).length));
+                fileOutputStream.write(data.get(i));
             }
-            fileOutputStream.write(Arrays.copyOf(data.get(data.size()-1),data.get(data.size()-1).length), 0, lastBytesCount);
+            fileOutputStream.write(data.get(data.size()-1), 0, lastBytesCount);
             fileOutputStream.close();
             fileOutputStream.close();
             System.out.println("file : " + fileName + " Successfully written!!");
@@ -243,11 +243,13 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
                 break;
             case "EOF":
                 fileDescriptor f = fileDescriptors.remove(controlData[1]);
+                //long time = System.currentTimeMillis();
                 makeFile(f.dataList, f.fileName,Integer.parseInt(controlData[2]));
+                //System.out.println(f.fileName + " : " + (System.currentTimeMillis()-time));
                 break;
             default:
                 if(fileDescriptors.containsKey(controlData[0])){
-                    fileDescriptors.get(controlData[0]).addData(Arrays.copyOfRange(data,100,data.length));
+                    fileDescriptors.get(controlData[0]).addData(Arrays.copyOfRange(data,100,Math.min(MTU, data.length)));
                 }
         }
     }

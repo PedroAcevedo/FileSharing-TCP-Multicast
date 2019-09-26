@@ -58,7 +58,7 @@ public class ClientSocketManager {
                 byte[] dataToBeSent = concatenate(fileHeader.getBytes(), buffer);
                 objectOutputStream.writeObject(Arrays.copyOf(dataToBeSent, dataToBeSent.length));
                 objectOutputStream.flush();
-                wait(3);
+                wait(1);
             }
             objectOutputStream.writeObject("EOF/"+ fileHeader.split("/")[0] + "/" + aux + "/");
             objectOutputStream.close();
