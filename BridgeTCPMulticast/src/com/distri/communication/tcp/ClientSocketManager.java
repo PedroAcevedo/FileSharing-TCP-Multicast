@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,10 +35,19 @@ public class ClientSocketManager {
         this.port = port;
         this.MTU = MTU;
     }
+    private String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder();
+        for (int i = 0; i < hash.length; i++) {
+        String hex = Integer.toHexString(0xff & hash[i]);
+        if(hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
     
     public synchronized void uploadFile(File file){
         try{
-            System.out.println("uploading file...");
+            System.out.println("uploading file..." + file.getName());
             Socket clientSocket = new Socket(serverIpAddress, port);
             
             ObjectInputStream objectInputStream = new ObjectInputStream(
@@ -47,11 +59,13 @@ public class ClientSocketManager {
             objectOutputStream.writeObject(fileHeader);
             objectOutputStream.flush();
             FileInputStream fileInputStream = new FileInputStream(file);
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            DigestInputStream dis = new DigestInputStream(fileInputStream,md);
             byte[] buffer = new byte[MTU-100];
             int bytesRead = 0;
             //int packetCounter = 0;
             int aux = 0;
-            while((bytesRead = fileInputStream.read(buffer)) != -1) {
+            while((bytesRead = dis.read(buffer)) != -1) {
                 if(bytesRead > 0){
                     aux = bytesRead;
                 }
@@ -60,9 +74,11 @@ public class ClientSocketManager {
                 objectOutputStream.flush();
                 wait(1);
             }
+            System.out.println("SHA-256 : " + bytesToHex(md.digest()));
             objectOutputStream.writeObject("EOF/"+ fileHeader.split("/")[0] + "/" + aux + "/");
             objectOutputStream.close();
             objectInputStream.close();
+            dis.close();
             fileInputStream.close();
             
             System.out.println("File uploaded successfully!... or not?");
@@ -70,7 +86,7 @@ public class ClientSocketManager {
             
         }catch(IOException e){
             System.err.println(e.getMessage());
-        } catch (InterruptedException ex) {
+        } catch (NoSuchAlgorithmException | InterruptedException ex) {
             Logger.getLogger(ClientSocketManager.class.getName()).log(Level.SEVERE, null, ex);
         } 
     }

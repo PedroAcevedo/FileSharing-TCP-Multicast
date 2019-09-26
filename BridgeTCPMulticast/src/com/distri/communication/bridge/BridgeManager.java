@@ -59,7 +59,7 @@ public class BridgeManager implements TCPServiceManagerCallerInterface, Multicas
             if(object instanceof String) {
                 nameFile = object.toString().split("/")[0];
                 multicastManager.sendData(("NEW/"+nameFile + "/").getBytes());
-                System.out.println("receiving file...");
+                System.out.println("receiving file..." + nameFile);
             }
             while(true){
                 object = objectInputStream.readObject();

@@ -14,8 +14,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.file.Path;
+import java.net.UnknownHostException;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,7 +31,6 @@ import java.util.logging.Logger;
 public class MulticastReceptorAppGUI extends javax.swing.JFrame implements MulticastManagerCallerInterface {
 
     public static int MTU;
-    
     MulticastManager multicastManager;
     ArrayList<String> fileNames;
     ArrayList<Integer> numberDatagrams;
@@ -38,10 +39,12 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     ArrayList<Integer> datagramCounters;
     boolean isReported = false;
     HashMap<String, fileDescriptor> fileDescriptors;
+    
     /**
      * Creates new form MulticastReceptorAppGUI
      */
     public MulticastReceptorAppGUI() {
+        
         initComponents();
         configMTU();
         this.multicastManager = null;
@@ -182,10 +185,10 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
             if(multicastManager == null) {
                 multicastManager = new MulticastManager(ipTextField.getText(), 
                         Integer.parseInt(portTextField.getText()), this, MulticastReceptorAppGUI.MTU);
-                //multicastManager.sendData(("HI/" + InetAddress.getLocalHost().getHostAddress() + "/").getBytes());
+                multicastManager.sendData(("HI/" + InetAddress.getLocalHost().getHostAddress() + "/").getBytes());
                 return true;
             }
-        }catch (Exception ex) {
+        }catch (NumberFormatException | UnknownHostException ex) {
             errorOnMulticastManager(ex);
         }
         return false;
@@ -195,20 +198,24 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         try {
             String path = System.getProperty("user.dir") + "/../WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources";
             fileOutputStream = new FileOutputStream(new File(path + "\\" + fileName));
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
             for (int i = 0; i < data.size()-1; i++) {
                 fileOutputStream.write(data.get(i));
+                md.update(data.get(i));
             }
             fileOutputStream.write(data.get(data.size()-1), 0, lastBytesCount);
+            System.out.println(fileName + " SHA-256 : " + bytesToHex(md.digest(Arrays.copyOf(data.get(data.size()-1), lastBytesCount))));
             fileOutputStream.close();
             fileOutputStream.close();
             System.out.println("file : " + fileName + " Successfully written!!");
             
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MulticastReceptorAppGUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (IOException | NoSuchAlgorithmException ex) {
             Logger.getLogger(MulticastReceptorAppGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
     private void makeFile(int fileIndex) {
         try {
             String path = System.getProperty("user.dir") + "/../WebServiceRESTMulticast/src/main/java/com/distri/webservicerestmulticast/resources";
@@ -231,6 +238,16 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         }
     }
     
+    private String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder();
+        for (int i = 0; i < hash.length; i++) {
+        String hex = Integer.toHexString(0xff & hash[i]);
+        if(hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+    
     @Override
     public void dataReceived(String sourceIpAddressOrHost, int sourcePort, byte[] data) {
         
@@ -238,7 +255,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         String[] controlData = controlString.split("/");
         switch(controlData[0]) {
             case "NEW":
-                System.out.println("receiving file...");
+                System.out.println("receiving file..." + controlData[1]);
                 fileDescriptors.put(controlData[1], new fileDescriptor(controlData[1]));
                 break;
             case "EOF":
@@ -249,7 +266,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
                 break;
             default:
                 if(fileDescriptors.containsKey(controlData[0])){
-                    fileDescriptors.get(controlData[0]).addData(Arrays.copyOfRange(data,100,Math.min(MTU, data.length)));
+                    fileDescriptors.get(controlData[0]).addData(Arrays.copyOfRange(data,100,MTU));
                 }
         }
     }
@@ -272,7 +289,6 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
     public void sendString(String data) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
     
     class fileDescriptor{
         //int lastBytesCount;
