@@ -266,7 +266,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
                 break;
             default:
                 if(fileDescriptors.containsKey(controlData[0])){
-                    fileDescriptors.get(controlData[0]).addData(Arrays.copyOfRange(data,100,MTU));
+                    fileDescriptors.get(controlData[0]).addData(Arrays.copyOfRange(data,100,data.length-100));
                 }
         }
     }
