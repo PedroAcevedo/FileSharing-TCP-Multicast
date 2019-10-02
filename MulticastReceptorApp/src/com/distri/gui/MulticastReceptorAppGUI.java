@@ -7,13 +7,20 @@ package com.distri.gui;
 
 import com.distri.communication.multicast.MulticastManager;
 import com.distri.communication.multicast.MulticastManagerCallerInterface;
+import com.google.gson.Gson;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
@@ -21,6 +28,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +40,7 @@ import java.util.logging.Logger;
 public class MulticastReceptorAppGUI extends javax.swing.JFrame implements MulticastManagerCallerInterface {
 
     public static int MTU;
+    public static String IP;
     MulticastManager multicastManager;
     ArrayList<String> fileNames;
     ArrayList<Integer> numberDatagrams;
@@ -47,6 +57,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         
         initComponents();
         configMTU();
+        configIP();
         this.multicastManager = null;
         this.fileNames = new ArrayList<>();
         this.numberDatagrams = new ArrayList<>();
@@ -54,6 +65,7 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
         this.dataReceived = new ArrayList<>();
         this.datagramCounters = new ArrayList<>();
         this.fileDescriptors = new HashMap();
+        
     }
 
     private void configMTU() {
@@ -63,6 +75,16 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
                             Paths.get("src/com/distri/resources/config/MTU.config").toAbsolutePath().toString())
                     )).readLine()
             );
+        }catch (Exception ex) {
+            System.err.println(ex);
+        }
+    }
+    
+    private void configIP() {
+        try {
+            MulticastReceptorAppGUI.IP = (new BufferedReader(new FileReader(
+                    Paths.get("src/com/distri/resources/config/IP.config").
+                            toAbsolutePath().toString()))).readLine();
         }catch (Exception ex) {
             System.err.println(ex);
         }
@@ -186,6 +208,11 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
                 multicastManager = new MulticastManager(ipTextField.getText(), 
                         Integer.parseInt(portTextField.getText()), this, MulticastReceptorAppGUI.MTU);
                 multicastManager.sendData(("HI/" + InetAddress.getLocalHost().getHostAddress() + "/").getBytes());
+                try {
+                    missingFiles(myFiles(),requestFromFiles().getFiles().keySet());
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
                 return true;
             }
         }catch (NumberFormatException | UnknownHostException ex) {
@@ -266,9 +293,70 @@ public class MulticastReceptorAppGUI extends javax.swing.JFrame implements Multi
                 break;
             default:
                 if(fileDescriptors.containsKey(controlData[0])){
-                    fileDescriptors.get(controlData[0]).addData(Arrays.copyOfRange(data,100,data.length-100));
+                    fileDescriptors.get(controlData[0]).addData(Arrays.copyOfRange(data,100,data.length));
                 }
         }
+    }
+    
+    public FileList requestFromFiles() throws MalformedURLException, IOException{
+        URL url=new URL("http://"+IP+":8080/WebServiceLoadBalancer/webresources/Main");
+        HttpURLConnection urlConnection=(HttpURLConnection) url.openConnection();
+        urlConnection.setConnectTimeout(5000);
+        FileList map = null; 
+        if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            Gson gson = new Gson();
+            while ((line = reader.readLine()) != null) {
+                map = gson.fromJson(line, FileList.class);
+            }
+            urlConnection.disconnect();
+        }
+        return map;
+    }
+    
+    public void missingFiles(ArrayList<String> myfolder, Set<String> theirfolder){
+        ArrayList<String> restFiles = new ArrayList<>();
+        Iterator i = theirfolder.iterator();
+           while(i.hasNext()){
+               String filein = i.next().toString();
+               System.out.println(filein);
+               if (!myfolder.contains(filein)) {
+                   restFiles.add(filein);
+               }
+           }
+        if (!restFiles.isEmpty()) {
+            for(String files : restFiles ){
+                System.out.println(downloadFiles(files));
+            }
+        }
+    }
+    
+    public ArrayList<String> myFiles(){
+        File file = new File(Paths.get("..\\WebServiceRESTMulticast\\src\\main\\java\\com\\distri\\webservicerestmulticast\\resources").toAbsolutePath().toString());
+        File[] listOfFiles = file.listFiles();
+        ArrayList<String> files = new ArrayList<>();
+        for (int i = 0; i < listOfFiles.length; i++) {
+            files.add(listOfFiles[i].getName());
+        }
+        return files;
+    }
+    
+    
+    public String downloadFiles(String filename){     
+        try (BufferedInputStream in = new BufferedInputStream(new URL("http://"+IP+":8080/WebServiceLoadBalancer/webresources/Main" + "/download/" + filename).openStream());
+            FileOutputStream fileOutputStream = new FileOutputStream( System.getProperty("user.dir") + "\\..\\WebServiceRESTMulticast\\src\\main\\java\\com\\distri\\webservicerestmulticast\\resources\\" + filename)) {
+            byte dataBuffer[] = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+               fileOutputStream.write(dataBuffer, 0, bytesRead);
+            }
+            return "Se descargo el archivo: " + filename + " con tamaño de: " + fileOutputStream.getChannel().size() + " Bytes";
+        } catch (IOException e) {
+            System.out.println(e);
+        } 
+        return "Error en descarga del archivo: " + filename;
     }
     
     @Override

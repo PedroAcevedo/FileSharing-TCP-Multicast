@@ -72,7 +72,7 @@ public class ClientSocketManager {
                 byte[] dataToBeSent = concatenate(fileHeader.getBytes(), buffer);
                 objectOutputStream.writeObject(Arrays.copyOf(dataToBeSent, dataToBeSent.length));
                 objectOutputStream.flush();
-                wait(1);
+                wait(8);
             }
             System.out.println("SHA-256 : " + bytesToHex(md.digest()));
             objectOutputStream.writeObject("EOF/"+ fileHeader.split("/")[0] + "/" + aux + "/");

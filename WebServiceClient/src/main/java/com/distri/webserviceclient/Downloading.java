@@ -14,6 +14,7 @@ import java.net.URL;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JProgressBar;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 /**
@@ -23,7 +24,7 @@ import javax.swing.SwingUtilities;
 public class Downloading extends Thread{
     
     JProgressBar progressBar;
-    JList jText;
+    JTextArea jText;
     private double increment;
     private String filename;
     private double size;
@@ -39,7 +40,7 @@ public class Downloading extends Thread{
       this.increment = (double)(d/size);
     }
 
-    public Downloading(JList jText, String filename){
+    public Downloading(JTextArea jText, String filename){
         this.jText = jText;
         this.filename = filename;
     }
@@ -51,10 +52,8 @@ public class Downloading extends Thread{
 //      } catch (IOException ex) {
 //          Logger.getLogger(Downloading.class.getName()).log(Level.SEVERE, null, ex);
 //      }    
-    String file = downloadFiles(filename);
-    DefaultListModel l = new DefaultListModel();
-    l.addElement(file);
-    jText.setModel(l);
+        String file = downloadFiles(filename);
+        jText.setText(jText.getText() + "\n" + file);
 
     }
     
@@ -112,10 +111,10 @@ public class Downloading extends Thread{
             while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                fileOutputStream.write(dataBuffer, 0, bytesRead);
             }
-              return "Se descargo el archivo: " + filename;
+              return "Se descargo el archivo: " + filename + " con tamaño de: " + fileOutputStream.getChannel().size() + " Bytes";
         } catch (IOException e) {
             System.out.println(e);
         } 
-        return "Error en descarga";
+        return "Error en descarga del archivo: " + filename;
     }
 }

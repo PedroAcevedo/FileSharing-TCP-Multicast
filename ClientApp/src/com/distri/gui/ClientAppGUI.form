@@ -44,11 +44,9 @@
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="jProgressBar1" pref="164" max="32767" attributes="0"/>
-                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                              <Component id="ipTextField" pref="164" max="32767" attributes="0"/>
-                              <Component id="portTextField" alignment="1" max="32767" attributes="0"/>
-                              <Component id="fileTextField" alignment="1" max="32767" attributes="0"/>
-                          </Group>
+                          <Component id="ipTextField" alignment="1" pref="164" max="32767" attributes="0"/>
+                          <Component id="portTextField" alignment="1" max="32767" attributes="0"/>
+                          <Component id="fileTextField" alignment="1" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="192" max="-2" attributes="0"/>
                   </Group>

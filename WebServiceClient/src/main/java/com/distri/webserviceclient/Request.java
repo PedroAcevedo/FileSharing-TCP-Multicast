@@ -17,6 +17,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Map;
+import java.util.Properties;
+import javax.swing.DefaultListModel;
 
 /**
  *
@@ -31,8 +33,8 @@ public class Request {
                 ":8080/WebServiceLoadBalancer/webresources/Main";
     }
     
-    public FilesList filesAvailables() throws MalformedURLException, IOException{
-        FilesList map = null;
+    public DefaultListModel filesAvailables() throws MalformedURLException, IOException{
+        DefaultListModel listModel = new DefaultListModel();
         URL url=new URL(URL);
         HttpURLConnection urlConnection=(HttpURLConnection) url.openConnection();
         urlConnection.setConnectTimeout(5000);
@@ -41,15 +43,18 @@ public class Request {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line = "";
             Gson gson = new Gson();
-            while ((line = reader.readLine()) != null){
-                if (!line.equals("{ \"Files\":{}}")) {
-                    map = gson.fromJson(line, FilesList.class);
-                }     
+            while ((line = reader.readLine()) != null) {
+                Properties filesIn = gson.fromJson(line, Properties.class);
+                String fileList = filesIn.getProperty("Files");
+                String[] archives = ((String)fileList.subSequence(1, fileList.length()-1)).split(",");
+                for(String archive : archives){
+                    listModel.addElement(archive.replace(" ", ""));
+                }
             }
-            urlConnection.disconnect();   
+            urlConnection.disconnect();
         }
-        return map;
-    }    
+        return listModel;
+    }      
     
     public String downloadFile(String filename){     
         try (BufferedInputStream in = new BufferedInputStream(new URL(Request.URL + "/download/" + filename).openStream());
