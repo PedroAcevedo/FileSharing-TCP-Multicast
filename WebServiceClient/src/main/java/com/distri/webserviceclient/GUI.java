@@ -8,7 +8,6 @@ package com.distri.webserviceclient;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
@@ -164,7 +163,7 @@ public class GUI extends javax.swing.JFrame {
         if (!jTextField1.getText().isEmpty()) {
         try {
             request = new Request(jTextField1.getText());
-            jList1.setModel(request.filesAvailables());
+            loadFiles();
             jButton1.setEnabled(true);
             jButton2.setEnabled(false);
             jButton3.setEnabled(true);
@@ -197,13 +196,32 @@ public class GUI extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         try {
-            jList1.removeAll();
-            jList1.setModel(request.filesAvailables());
-            jList1.setEnabled(true);
+            request = new Request(jTextField1.getText());
+            loadFiles();
         } catch (IOException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+    
+    public void loadFiles() throws IOException{
+        DefaultListModel listmodel = new DefaultListModel();
+        availablesFiles = request.filesAvailables();
+        Iterator i = availablesFiles.getFiles().keySet().iterator();
+        while(i.hasNext()){
+            listmodel.addElement(i.next().toString());
+        if (availablesFiles.getFiles().size() > 0) {
+            i = availablesFiles.getFiles().keySet().iterator();
+            while(i.hasNext()){
+                listmodel.addElement(i.next().toString());
+            }
+            jList1.setModel(listmodel);
+        }else{
+            listmodel.addElement("No hay archivos disponibles");
+            jList1.setModel(listmodel);
+        }
+        jList1.setModel(listmodel);
+    }
+    }
     
     /**
      * @param args the command line arguments

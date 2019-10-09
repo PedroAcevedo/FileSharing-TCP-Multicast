@@ -40,7 +40,6 @@ public class MainResource {
      * Creates a new instance of MainResource
      */
     public MainResource() {
-        System.out.println("HOLA");
     }
 
     /**

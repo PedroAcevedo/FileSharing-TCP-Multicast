@@ -1,5 +1,5 @@
-C:\Users\pdacevedo\Downloads\FileSharing-TCP-Multicast-master\WebServiceLoadBalancer\src\main\java\com\distri\webserviceloadbalancer\methods\FilesList.java
-C:\Users\pdacevedo\Downloads\FileSharing-TCP-Multicast-master\WebServiceLoadBalancer\src\main\java\com\distri\webserviceloadbalancer\methods\RoundRobin.java
-C:\Users\pdacevedo\Downloads\FileSharing-TCP-Multicast-master\WebServiceLoadBalancer\src\main\java\com\distri\webserviceloadbalancer\ApplicationConfig.java
-C:\Users\pdacevedo\Downloads\FileSharing-TCP-Multicast-master\WebServiceLoadBalancer\src\main\java\com\distri\webserviceloadbalancer\MainResource.java
-C:\Users\pdacevedo\Downloads\FileSharing-TCP-Multicast-master\WebServiceLoadBalancer\src\main\java\com\distri\webserviceloadbalancer\methods\RequestMethods.java
+/home/pedross/Downloads/PARCIAL 1 - DISTRIBUIDAS-20191009T033048Z-001/PARCIAL 1 - DISTRIBUIDAS/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/methods/FilesList.java
+/home/pedross/Downloads/PARCIAL 1 - DISTRIBUIDAS-20191009T033048Z-001/PARCIAL 1 - DISTRIBUIDAS/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/methods/RequestMethods.java
+/home/pedross/Downloads/PARCIAL 1 - DISTRIBUIDAS-20191009T033048Z-001/PARCIAL 1 - DISTRIBUIDAS/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/MainResource.java
+/home/pedross/Downloads/PARCIAL 1 - DISTRIBUIDAS-20191009T033048Z-001/PARCIAL 1 - DISTRIBUIDAS/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/methods/RoundRobin.java
+/home/pedross/Downloads/PARCIAL 1 - DISTRIBUIDAS-20191009T033048Z-001/PARCIAL 1 - DISTRIBUIDAS/WebServiceLoadBalancer/src/main/java/com/distri/webserviceloadbalancer/ApplicationConfig.java
