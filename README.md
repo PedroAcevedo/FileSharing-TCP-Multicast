@@ -1,32 +1,34 @@
-# FileSharingP2P
+# FileSharingP2P :exclamation: :exclamation:
 Primer Parcial Programación Distribuida
-Integrantes
+
+Integrantes :mega:
 Pedro David Acevedo
 Eduardo Angulo
 Carlos Conrado
 Andres Ramirez
 
-_____________Instruciones________________
+# :eyes: _____________Instruciones________________ :eyes: 
 
 Requerido hacer Clean-And-Build en cada proyecto
-Servidor Brigde
+Servidor Brigde :satellite:
 
 	Correr WebServiceLoadBalancer
 	Correr BrigdeTCPMulticast
 
-Servidor Multicast Receptor
+Servidor Multicast Receptor :satellite:
 
 	Correr MulticastReceptorApp
 	Correr WebServiceRESTMulticast
 
-Client
+Client :computer:
 
 	Correr ClientApp
 	
-Web Service Client
+Web Service Client :satellite:
 	
 	WebServiceClient
-	
+
+# :eyes:
 Antes de conectar editar el archivo. ..\MulticastReceptorApp\src\com\distri\resources\config\IP con la IP de la maquina que tenga el WebServiceLoadBalancer
 	
 -Carpeta de almacenamiento de archivos MulticastReceptorApp: 
@@ -35,7 +37,7 @@ Antes de conectar editar el archivo. ..\MulticastReceptorApp\src\com\distri\reso
 -Carpeta de almacenamiento del cliente webservice:
 ...\WebServiceClient\resources
 
-________________Alcance___________________
+# :bookmark_tabs: ________________Alcance___________________ :bookmark_tabs:
 
 + Todo implementado, hasta la modificación.
 Debido a la implementación dentro de el envio por multicast, los archvios grandes pierden paquetes por lo que corrrompen los archivos.
